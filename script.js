@@ -1,28 +1,35 @@
-class Counter  {
-  count = 0;
-  constructor(){
-    if(typeof Counter.instance === 'object'){
-      return Counter.instance
-    }
-    Counter.instance = this
-    return Counter.instance
+class EventObserver {
+  constructor() {
+    this.observers = []
   }
 
-  getCounter(){
-    return this.count
+  subscribe(fn) {
+    this.observers.push(fn)
   }
 
-  incCounter(){
-    this.count++
+  unsubscribe(fn) {
+    this.observers = this.observers.filter(subscriber => subscriber !== fn)
+  }
+
+  broadcast(data) {
+    this.observers.forEach(subscriber => subscriber(data))
   }
 }
 
-let a = new Counter()
-let b = new Counter()
+const observer = new EventObserver();
+
+const textArea = document.querySelector('.textField');
+const output = document.querySelector('.countField');
 
 
-a.incCounter()
-b.incCounter()
+observer.subscribe(data => {
+  console.log('subscribe for module 1 fired', data)
+})
 
-console.log(a === b)
-console.log(b)
+observer.subscribe(data => {
+  output.innerText = data.trim().split(' ').length
+})
+
+textArea.oninput = () => {
+  observer.broadcast(textArea.value)
+}
